@@ -2,6 +2,7 @@ package exec
 
 import (
 	"github.com/pkg/errors"
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 
 	cfg "github.com/cloudposse/atmos/pkg/config"
@@ -82,4 +83,22 @@ func ExecuteDescribeComponent(
 	}
 
 	return configAndStacksInfo.ComponentSection, nil
+}
+
+// FilterAbstractComponents This function removes abstract components and returns the list of components
+func FilterAbstractComponents(componentsMap map[string]any) []string {
+	components := make([]string, 0)
+	for _, k := range lo.Keys(componentsMap) {
+		if v5, ok := componentsMap[k].(map[string]any); ok {
+			if v6, ok := v5["metadata"].(map[string]any); ok {
+				if v7, ok := v6["type"]; ok {
+					if v7 == "abstract" {
+						continue
+					}
+				}
+			}
+		}
+		components = append(components, k)
+	}
+	return components
 }
